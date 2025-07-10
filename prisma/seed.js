@@ -73,35 +73,35 @@ async function main() {
   await prisma.workshop.deleteMany();
   await prisma.user.deleteMany();
 
-  console.log("👤 Creating users (1 admin + 9 customers)...");
+  console.log("👤 Creating 1 admin and 9 customer users...");
 
   const users = [];
 
-  // Create hardcoded admin user
+  // Create fixed admin
   const adminUser = await prisma.user.create({
     data: {
       name: "Mekin Jemal",
       email: "mekinjemal999@gmail.com",
-      password: "admin123", // ⚠️ In production, hash this!
+      password: "admin123", // 🔒 In real apps, use bcrypt
       role: "ADMIN",
     },
   });
-  users.push(adminUser);
+  users.push(adminUser); // admin is at index 0
 
-  // Create 9 fake customers
+  // Create 9 customers
   for (let i = 0; i < 9; i++) {
     const customer = await prisma.user.create({
       data: {
         name: faker.person.fullName(),
         email: faker.internet.email(),
-        password: faker.internet.password(), // ⚠️ Hash this in production
+        password: faker.internet.password(),
         role: "CUSTOMER",
       },
     });
-    users.push(customer);
+    users.push(customer); // customers are at index 1 to 9
   }
 
-  console.log("📚 Creating 10 real workshops with time slots...");
+  console.log("📚 Creating workshops with time slots...");
   for (const data of mockWorkshops) {
     const workshop = await prisma.workshop.create({
       data: {
@@ -122,9 +122,9 @@ async function main() {
       include: { timeSlots: true },
     });
 
-    // Book 2 random customers into random time slots
+    // Book 2 random customers (skip index 0 = admin)
     for (let j = 0; j < 2; j++) {
-      const customer = users[faker.number.int({ min: 1, max: 9 })]; // skip admin at index 0
+      const customer = users[faker.number.int({ min: 1, max: 9 })];
       const timeSlot = faker.helpers.arrayElement(workshop.timeSlots);
 
       await prisma.booking.create({
