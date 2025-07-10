@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+
+  express-api:
+    build:
+      context: .
+    image: mekin2024/express-api:latest
+    container_name: express_api
+    restart: always
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgresql://myuser:mypassword@postgres:5432/mydatabase?schema=public"
+      PORT: 3000
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    command: >
+      sh -c "
+        echo 'Waiting for Postgres...';
+        until nc -z postgres 5432; do sleep 1; done;
+        echo 'Postgres is up. Running Prisma migrate...';
+        npx prisma migrate deploy &&
+        echo 'Running seed script...' &&
+        npm run seed &&
+        echo 'Starting the server...' &&
+        npm run start
+      "
+
+volumes:
+  node_modules:

@@ -1,0 +1,130 @@
+### Variables
+@baseUrl = http://localhost:3000
+@adminEmail =mekinjemal999@gmail.com
+@adminPassword =mekin0828
+@customerEmail = user1234@example.com
+@customerPassword =john@email.com
+
+### --------------------------
+### 1. AUTHENTICATION
+### --------------------------
+
+### Register Customer
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "{{customerEmail}}",
+  "password": "{{customerPassword}}"
+}
+
+### Register Admin
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}",
+  "role": "ADMIN"
+}
+
+### Login Customer
+# @name customerLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{customerEmail}}",
+  "password": "{{customerPassword}}"
+}
+
+### Login Admin
+# @name adminLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+### Store tokens
+@customerToken = {{customerLogin.response.body.token}}
+@adminToken = {{adminLogin.response.body.token}}
+
+### --------------------------
+### 2. WORKSHOPS (Customer)
+### --------------------------
+
+### Get all workshops (Public)
+GET {{baseUrl}}/api/workshops
+
+### --------------------------
+### 3. WORKSHOPS (Admin)
+### --------------------------
+
+### Create workshop (Admin)
+POST {{baseUrl}}/api/workshops
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Advanced AI",
+  "description": "Learn advanced JS concepts",
+  "date": "2025-12-15",
+  "maxCapacity": 1,
+  "timeSlots": [
+    {
+      "startTime": "10:00 AM",
+      "endTime": "12:00 PM"
+    },
+    {
+      "startTime": "02:00 PM",
+      "endTime": "04:00 PM"
+    }
+  ]
+}
+
+
+
+### Create booking (Customer)
+POST {{baseUrl}}/api/bookings
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "workshopId": 1,
+  "timeSlotId": 3
+}
+
+### Create booking (Customer)
+GET {{baseUrl}}/api/bookings/my
+
+
+
+### --------------------------
+### 5. ADMIN BOOKINGS
+### --------------------------
+
+### Get all bookings (Admin)
+GET {{baseUrl}}/api/bookings
+Authorization: Bearer {{adminToken}}
+
+### Update booking status (Admin)
+PATCH {{baseUrl}}/api/admin/bookings/2
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "CONFIRMED"
+}
+
+### --------------------------
+### 6. ADMIN DASHBOARD
+### --------------------------
+
+### Get dashboard stats (Admin)
+GET {{baseUrl}}/api/admin/stats
+Authorization: Bearer {{adminToken}}
