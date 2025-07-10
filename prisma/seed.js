@@ -74,17 +74,31 @@ async function main() {
   await prisma.user.deleteMany();
 
   console.log("👤 Creating users (1 admin + 9 customers)...");
+
   const users = [];
-  for (let i = 0; i < 10; i++) {
-    const user = await prisma.user.create({
+
+  // Create hardcoded admin user
+  const adminUser = await prisma.user.create({
+    data: {
+      name: "Mekin Jemal",
+      email: "mekinjemal999@gmail.com",
+      password: "admin123", // ⚠️ In production, hash this!
+      role: "ADMIN",
+    },
+  });
+  users.push(adminUser);
+
+  // Create 9 fake customers
+  for (let i = 0; i < 9; i++) {
+    const customer = await prisma.user.create({
       data: {
         name: faker.person.fullName(),
         email: faker.internet.email(),
-        password: faker.internet.password(), // should be hashed in real app
-        role: i === 0 ? "ADMIN" : "CUSTOMER",
+        password: faker.internet.password(), // ⚠️ Hash this in production
+        role: "CUSTOMER",
       },
     });
-    users.push(user);
+    users.push(customer);
   }
 
   console.log("📚 Creating 10 real workshops with time slots...");
@@ -110,7 +124,7 @@ async function main() {
 
     // Book 2 random customers into random time slots
     for (let j = 0; j < 2; j++) {
-      const customer = users[faker.number.int({ min: 1, max: 9 })]; // skip admin
+      const customer = users[faker.number.int({ min: 1, max: 9 })]; // skip admin at index 0
       const timeSlot = faker.helpers.arrayElement(workshop.timeSlots);
 
       await prisma.booking.create({

@@ -8,7 +8,7 @@ This repository contains the **backend API** for the Workshop Booking System. It
 > 📁 **Repository:** [github.com/Mekin-jema/workshop-booking-backend](https://github.com/Mekin-jema/workshop-booking-backend)
 
 ---
-
+ 
 ## ✨ Key Features
 
 * 🔐 JWT Authentication (Admin & Customer)
@@ -87,6 +87,8 @@ npx prisma migrate dev --name init
 ## 🧪 Running Tests
 
 This project uses **Jest** and **Supertest** for API testing.
+
+
 
 ```bash
 # Run all tests
