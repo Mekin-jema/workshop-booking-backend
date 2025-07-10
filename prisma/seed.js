@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { faker } = require("@faker-js/faker");
+const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
@@ -77,28 +78,34 @@ async function main() {
 
   const users = [];
 
+  // Hash password
+  const hashedAdminPassword = await bcrypt.hash("admin123", 10);
+
   // Create fixed admin
   const adminUser = await prisma.user.create({
     data: {
       name: "Mekin Jemal",
       email: "mekinjemal999@gmail.com",
-      password: "admin123", // 🔒 In real apps, use bcrypt
+      password: hashedAdminPassword,
       role: "ADMIN",
     },
   });
-  users.push(adminUser); // admin is at index 0
+  users.push(adminUser);
 
-  // Create 9 customers
+  // Create 9 customers with hashed passwords
   for (let i = 0; i < 9; i++) {
+    const plainPassword = faker.internet.password();
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
     const customer = await prisma.user.create({
       data: {
         name: faker.person.fullName(),
         email: faker.internet.email(),
-        password: faker.internet.password(),
+        password: hashedPassword,
         role: "CUSTOMER",
       },
     });
-    users.push(customer); // customers are at index 1 to 9
+    users.push(customer);
   }
 
   console.log("📚 Creating workshops with time slots...");
