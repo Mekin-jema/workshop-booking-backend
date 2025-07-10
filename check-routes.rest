@@ -1,7 +1,7 @@
 ### Variables
 @baseUrl = http://localhost:3000
 @adminEmail =mekinjemal999@gmail.com
-@adminPassword =mekin0828
+@adminPassword =mekinjemal999@gmail.com
 @customerEmail = user1234@example.com
 @customerPassword =john@email.com
 
